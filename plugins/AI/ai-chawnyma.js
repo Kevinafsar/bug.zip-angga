@@ -32,11 +32,14 @@ async function fetchCompletion(inputValue) {
                 'Content-Type': 'application/json;charset=UTF-8',
             },
             body: JSON.stringify({
-                "model": "gpt-3.5-turbo",
-                "messages": [{
-                    role: 'user',
-                    content: inputValue,
-                }, ],
+                model: "gpt-3.5-turbo",
+                messages: [{
+                    role: "system",
+                    content: "Kamu adalah AI."
+                }, {
+                    role: "user",
+                    content: inputValue
+                }]
             }),
         });
         const chatData = await chatResponse.json();
