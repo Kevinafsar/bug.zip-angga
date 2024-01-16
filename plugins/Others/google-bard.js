@@ -138,7 +138,7 @@ async function GoogleBard(query) {
 
         const answer = JSON.parse(JSON.parse(responseText.split("\n").reduce((a, b) => (a.length > b.length ? a : b), ""))[0][2])[4][0][1];
 
-        return answer;
+        return answer.join('');
     } catch (error) {
         console.error("An error occurred:", error.message);
         throw error;
