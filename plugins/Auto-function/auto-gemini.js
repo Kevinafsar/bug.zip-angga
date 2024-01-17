@@ -45,9 +45,26 @@ export async function before(m) {
 
             if (reply) m.reply(reply);
         } else {
-            m.reply("No suitable response from the API.");
+            const {
+                result
+            } = await AemtGemini(msg);
+            if (result) m.reply(result);
         }
     } catch (error) {
         console.error(error);
     }
 }
+
+async function AemtGemini(query) {
+    const headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    };
+
+    const bardRes = await fetch(`https://aemt.me/gemini?text=${query}`, {
+        method: "get",
+        headers
+    });
+    const bardText = await bardRes.json();
+    return bardText;
+};
