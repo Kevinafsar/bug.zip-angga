@@ -25,19 +25,14 @@ let handler = async (m, {
             await m.reply(res.content);
         } catch (e) {
             try {
-                let res = await YanzBard(text)
+                let res = await AemtBard(text)
                 await m.reply(res);
             } catch (e) {
                 try {
-                    let res = await AzzBard(text)
+                    let res = await GoogleBard(text)
                     await m.reply(res);
                 } catch (e) {
-                    try {
-                        let res = await GoogleBard(text)
-                        await m.reply(res);
-                    } catch (e) {
-                        await m.reply(eror);
-                    }
+                    await m.reply(eror);
                 }
             }
         }
@@ -45,8 +40,17 @@ let handler = async (m, {
         let media = await q.download()
         let isTele = /image\/(png|jpe?g)/.test(mime)
         let link = await uploadImage(media)
-        let res = await RizzBardImg(text, link)
-        await m.reply(res.content);
+        try {
+            let res = await RizzBardImg(text, link)
+            await m.reply(res.content);
+        } catch (e) {
+            try {
+                let res = await AemtBardImg(text, link)
+                await m.reply(res);
+            } catch (e) {
+                await m.reply(eror);
+            }
+        }
     } else return m.reply("Use *bard (text)* or *bardimg (text/media)*")
 }
 handler.help = ["bard", "bardimg"]
@@ -69,13 +73,13 @@ async function RizzBardImg(query, url) {
     });
 };
 
-async function YanzBard(query) {
+async function AemtBard(query) {
     const headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
     };
 
-    const bardRes = await fetch(`https://api.yanzbotz.my.id/api/ai/bard?query=${query}`, {
+    const bardRes = await fetch(`https://aemt.me/bard?text=${query}`, {
         method: "get",
         headers
     });
@@ -83,22 +87,18 @@ async function YanzBard(query) {
     return bardText.result;
 };
 
-async function AzzBard(query) {
+async function AemtBardImg(query, url) {
     const headers = {
-        "Host": "api.azz.biz.id",
-        "X-Same-Domain": "1",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        "Origin": "https://api.azz.biz.id",
-        "Referer": "https://api.azz.biz.id"
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
     };
 
-    const bardRes = await fetch(`https://api.azz.biz.id/api/bard?q=${query}&key=global`, {
+    const bardRes = await fetch(`https://aemt.me/bardimg?url=${url}&text=${query}`, {
         method: "get",
         headers
     });
     const bardText = await bardRes.json();
-    return bardText.respon;
+    return bardText.result;
 };
 
 async function GoogleBard(query) {
