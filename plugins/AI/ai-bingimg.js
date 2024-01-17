@@ -1,6 +1,7 @@
 const {
     BingImageCreator
 } = await (await import('../../lib/ai/bing-image.js'));
+import fetch from 'node-fetch';
 
 const handler = async (m, {
     conn,
@@ -51,8 +52,27 @@ const handler = async (m, {
             await m.reply('No images found after filtering.');
         }
     } catch (error) {
-        console.error(`Error in handler: ${error.message}`);
-        await m.reply('An error occurred while processing the request.');
+        try {
+            const data = await AemtBingImg(text);
+            try {
+                await conn.sendFile(
+                    m.chat,
+                    data.result,
+                    '',
+                    `Image`,
+                    m,
+                    false, {
+                        mentions: [m.sender],
+                    }
+                );
+            } catch (error) {
+                console.error(`Error sending file: ${error.message}`);
+                await m.reply(`Failed to send image`);
+            }
+        } catch (error) {
+            console.error(`Error in handler: ${error.message}`);
+            await m.reply('An error occurred while processing the request.');
+        }
     }
 };
 
@@ -60,3 +80,17 @@ handler.help = ["bingimg *[query]*"];
 handler.tags = ["ai"];
 handler.command = /^(bingimg)$/i;
 export default handler;
+
+async function AemtBingImg(query) {
+    const headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    };
+
+    const bardRes = await fetch(`https://aemt.me/bingimg?text=${query}`, {
+        method: "get",
+        headers
+    });
+    const bardText = await bardRes.json();
+    return bardText;
+};
